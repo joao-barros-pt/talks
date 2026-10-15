@@ -1,0 +1,24 @@
+// aov-wrong-vs-right.dax
+// Run in Power BI Desktop > DAX query view, with the Adventure Works DW 2020 sample model.
+// The Sales table is one row per order line, so AVERAGE over it is an average per line, not per order.
+
+DEFINE
+    MEASURE Sales[AOV per line] =
+        AVERAGE ( Sales[Sales Amount] )
+
+    MEASURE Sales[Orders] =
+        DISTINCTCOUNT ( 'Sales Order'[Sales Order] )
+
+    MEASURE Sales[AOV per order] =
+        DIVIDE ( SUM ( Sales[Sales Amount] ), [Orders] )
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    "Lines", COUNTROWS ( Sales ),
+    "Orders", [Orders],
+    "Sales Amount", SUM ( Sales[Sales Amount] ),
+    "AOV per line (wrong)", [AOV per line],
+    "AOV per order (right)", [AOV per order]
+)
+ORDER BY 'Date'[Fiscal Year]

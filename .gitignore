@@ -1,0 +1,17 @@
+# Windows and macOS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Python
+.venv/
+__pycache__/
+
+# Local settings of AI assistants
+CLAUDE.local.md
+**/.claude/settings.local.json
+
+# Power BI: the .pbix files come from Microsoft's sample repositories
+*.pbix
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
