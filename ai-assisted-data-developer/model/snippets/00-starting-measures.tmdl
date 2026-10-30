@@ -1,0 +1,32 @@
+// 00-starting-measures.tmdl
+// The two measures the demos start from, before demo 3. Not a file of the model: copy each block
+// into the table file named above it, inside the table, with the indentation shown (tabs).
+//
+// FILL IN the cost of goods sold accounts of your lab before you use Cost (check 9 of
+// sql/00-row-counts-by-company.sql and the General Posting Setup in Business Central).
+// Several accounts: { "<account-1>", "<account-2>" }.
+// The same list goes into sql/02-company-key-trap.sql, so the model and the SQL reconcile.
+
+
+// ===== definition/tables/salesInvoices.tmdl (inside: table salesInvoices) =====
+
+	/// Revenue excluding tax, posted invoices only (status Open or Paid). Amounts in the invoice currency.
+	measure Revenue =
+			CALCULATE (
+			    SUM ( salesInvoices[totalAmountExcludingTax] ),
+			    KEEPFILTERS ( salesInvoices[status] IN { "Open", "Paid" } )
+			)
+		formatString: #,0.00
+
+
+// ===== definition/tables/generalLedgerEntries.tmdl (inside: table generalLedgerEntries) =====
+
+	/// Cost of goods sold: debit minus credit on the COGS accounts, entries of posted sales invoices only.
+	/// Reaches the customer through generalLedgerEntries[invoiceKey] -> salesInvoices[invoiceKey].
+	measure Cost =
+			CALCULATE (
+			    SUM ( generalLedgerEntries[debitAmount] ) - SUM ( generalLedgerEntries[creditAmount] ),
+			    KEEPFILTERS ( generalLedgerEntries[accountNumber] IN { "<cogs-account>" } ),
+			    KEEPFILTERS ( salesInvoices[status] IN { "Open", "Paid" } )
+			)
+		formatString: #,0.00

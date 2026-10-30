@@ -1,0 +1,53 @@
+// 03-reuse-everywhere.dax
+// Demo 2, second half: one function, many measures.
+// AW.ShareOf works with any metric and any column. Each measure below is one line.
+// Run 01 and 02 with "Update model with changes" first, or keep the FUNCTION
+// definitions in this DEFINE block (they are repeated here so the file runs alone).
+
+DEFINE
+    /// Divides an amount by the number of distinct sales orders in the current filter context.
+    FUNCTION AW.PerOrder = (
+            amount : NUMERIC
+        ) =>
+        DIVIDE ( amount, DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) )
+
+    /// Share of the current value in the total over all values of one column.
+    FUNCTION AW.ShareOf = (
+            metric : SCALAR EXPR,
+            scope : COLUMNREF
+        ) =>
+        DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scope ) ) )
+
+    MEASURE Sales[Total Sales] =
+        SUM ( Sales[Sales Amount] )
+
+    MEASURE Sales[Orders] =
+        DISTINCTCOUNT ( 'Sales Order'[Sales Order] )
+
+    MEASURE Sales[Average Order Value] =
+        AW.PerOrder ( [Total Sales] )
+
+    // Same function, different metric, different column
+    MEASURE Sales[Sales % of Category] =
+        AW.ShareOf ( [Total Sales], 'Product'[Category] )
+
+    MEASURE Sales[Orders % of Category] =
+        AW.ShareOf ( [Orders], 'Product'[Category] )
+
+    MEASURE Sales[Sales % of Fiscal Year] =
+        AW.ShareOf ( [Total Sales], 'Date'[Fiscal Year] )
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    'Product'[Category],
+    "Total Sales", [Total Sales],
+    "Sales % of Category", [Sales % of Category],
+    "Orders % of Category", [Orders % of Category],
+    "Sales % of Fiscal Year", [Sales % of Fiscal Year],
+    "Average Order Value", [Average Order Value]
+)
+ORDER BY 'Date'[Fiscal Year], 'Product'[Category]
+
+// Note: one order can hold products of several categories, so
+// "Orders % of Category" does not have to add up to 100% inside a year.

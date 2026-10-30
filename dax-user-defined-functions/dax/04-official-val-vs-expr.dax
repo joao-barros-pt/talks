@@ -1,0 +1,24 @@
+// 04-official-val-vs-expr.dax
+// Microsoft's own val vs expr example, from the DAX user-defined functions article
+// (https://learn.microsoft.com/dax/best-practices/dax-user-defined-functions).
+// It uses the same Adventure Works DW 2020 sample model as this session.
+// The article says it returns 84285 and 121253: FY2020 lines only, then all lines.
+
+DEFINE
+    /// Table val: receives a materialized table, context can't be changed
+    FUNCTION CountRowsNow = (
+            t : TABLE VAL
+        ) =>
+        COUNTROWS ( CALCULATETABLE ( t, ALL ( 'Date' ) ) )
+
+    /// Table expr: receives an unevaluated expression, context CAN be changed
+    FUNCTION CountRowsLater = (
+            t : TABLE EXPR
+        ) =>
+        COUNTROWS ( CALCULATETABLE ( t, ALL ( 'Date' ) ) )
+
+EVALUATE
+{
+    CALCULATE ( CountRowsNow ( 'Sales' ), 'Date'[Fiscal Year] = "FY2020" ),
+    CALCULATE ( CountRowsLater ( 'Sales' ), 'Date'[Fiscal Year] = "FY2020" )
+}

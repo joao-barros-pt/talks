@@ -1,0 +1,51 @@
+// 05-optional-parameters.dax
+// Optional parameters (default expressions), generally available since the June 2026 release.
+// A parameter with "= <default>" can be left out by the caller.
+// The default can only use names visible where the function is defined.
+
+DEFINE
+    /// Relative change between two values. BLANK when the base is zero or blank.
+    /// @param {NUMERIC} current - The value now.
+    /// @param {NUMERIC} previous - The value to compare with.
+    /// @param {INT64} [decimals] - Rounding of the result. Optional, 4 by default.
+    /// @returns The relative change, rounded, or BLANK when there is no base.
+    FUNCTION AW.PctChange = (
+            current : NUMERIC,
+            previous : NUMERIC,
+            decimals : INT64 = 4
+        ) =>
+        IF (
+            previous <> 0,
+            ROUND ( ( current - previous ) / previous, decimals )
+        )
+
+    MEASURE Sales[Total Sales] =
+        SUM ( Sales[Sales Amount] )
+
+    // 'Date'[Date] is the column the Date table is marked with.
+    MEASURE Sales[Total Sales PY] =
+        CALCULATE ( [Total Sales], DATEADD ( 'Date'[Date], -1, YEAR ) )
+
+    // Only where there are sales, so a year after the last sale doesn't show -1.
+    MEASURE Sales[Sales Change] =
+        IF (
+            NOT ISBLANK ( [Total Sales] ),
+            AW.PctChange ( [Total Sales], [Total Sales PY] )
+        )
+
+EVALUATE
+{
+    AW.PctChange ( 110, 100 ),      // default rounding: 0.1
+    AW.PctChange ( 2, 3, 2 ),       // explicit rounding: -0.33
+    AW.PctChange ( 5, 0 )           // no base: BLANK
+}
+
+// The same function on the model: sales change against the previous fiscal year.
+// FY2018 has no previous year in the model, so its change is BLANK.
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    "Total Sales", [Total Sales],
+    "Sales Change", [Sales Change]
+)
+ORDER BY 'Date'[Fiscal Year]

@@ -1,0 +1,28 @@
+// 00-model-check.dax
+// Run first, in Power BI Desktop > DAX query view, on the Adventure Works DW 2020 sample model.
+// It checks that this is the right model before you write any function.
+// Sales is one row per sales order line. 'Sales Order'[Sales Order] is the order number.
+// Expected totals are the ones in ../../prompting-for-data-people/dax/README.md:
+// 121,253 lines and 31,455 orders over the whole model.
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    "Lines", COUNTROWS ( Sales ),
+    "Orders", DISTINCTCOUNT ( 'Sales Order'[Sales Order] ),
+    "Sales Amount", SUM ( Sales[Sales Amount] )
+)
+ORDER BY 'Date'[Fiscal Year]
+
+EVALUATE
+{
+    ( COUNTROWS ( Sales ), DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) )
+}
+
+// Product categories used in demo 2
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Product'[Category],
+    "Sales Amount", SUM ( Sales[Sales Amount] )
+)
+ORDER BY 'Product'[Category]

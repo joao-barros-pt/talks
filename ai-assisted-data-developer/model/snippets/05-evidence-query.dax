@@ -1,0 +1,23 @@
+// 05-evidence-query.dax
+// Run in Power BI Desktop > DAX query view, live editing the Margin model, after demos 3 and 4.
+// Per company, the numbers must match check 5 of sql/02-company-key-trap.sql (with the same COGS accounts).
+// The second result is the group total: the four companies must add up to it. London is in GBP and the other
+// three in EUR, so this total mixes currencies: it proves that nothing is lost, it is not a revenue figure.
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    customers[company],
+    "Revenue", [Revenue],
+    "Cost", [Cost],
+    "Gross Margin", [Gross Margin],
+    "Gross Margin %", [Gross Margin %]
+)
+ORDER BY customers[company]
+
+EVALUATE
+ROW (
+    "Revenue", [Revenue],
+    "Cost", [Cost],
+    "Gross Margin", [Gross Margin],
+    "Gross Margin %", [Gross Margin %]
+)

@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+CLAUDE.local.md
+*.pbix
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+fabric/export/

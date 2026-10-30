@@ -1,0 +1,50 @@
+// 01-first-function.dax
+// Demo 1: your first DAX user-defined function, written and tested in DAX query view.
+// Model: Adventure Works DW 2020. Sales is one row per order line, so "per order"
+// means dividing by the distinct count of 'Sales Order'[Sales Order], never by rows.
+// The rule lives in one function. Every "per order" measure calls it.
+
+DEFINE
+    /// Divides an amount by the number of distinct sales orders in the current filter context.
+    /// @param {NUMERIC} amount - The amount to spread over orders, evaluated by the caller.
+    /// @returns The amount per order, or BLANK when there are no orders.
+    FUNCTION AW.PerOrder = (
+            amount : NUMERIC
+        ) =>
+        DIVIDE ( amount, DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) )
+
+    MEASURE Sales[Total Sales] =
+        SUM ( Sales[Sales Amount] )
+
+    MEASURE Sales[Orders] =
+        DISTINCTCOUNT ( 'Sales Order'[Sales Order] )
+
+    // Two measures, one rule
+    MEASURE Sales[Average Order Value] =
+        AW.PerOrder ( [Total Sales] )
+
+    MEASURE Sales[Lines per Order] =
+        AW.PerOrder ( COUNTROWS ( Sales ) )
+
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    "Total Sales", [Total Sales],
+    "Orders", [Orders],
+    "Average Order Value", [Average Order Value],
+    "Lines per Order", [Lines per Order]
+)
+ORDER BY 'Date'[Fiscal Year]
+
+// Reconciliation: the function must match the long-hand formula exactly.
+EVALUATE
+{
+    (
+        AW.PerOrder ( [Total Sales] ),
+        DIVIDE ( SUM ( Sales[Sales Amount] ), DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) )
+    )
+}
+
+// To keep the function and the measures in the model:
+// click "Update model with changes" in DAX query view.
+// The function then shows under Functions in Model explorer.

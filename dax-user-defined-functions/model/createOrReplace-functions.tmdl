@@ -1,0 +1,14 @@
+createOrReplace
+
+	/// Divides an amount by the number of distinct sales orders in the current filter context.
+	/// Sales is one row per order line: this is the one place where "per order" is defined.
+	function 'AW.PerOrder' =
+			( amount : NUMERIC ) =>
+			DIVIDE ( amount, DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) )
+
+	/// Share of the current value in the total over all values of one column.
+	/// metric is EXPR on purpose: it is evaluated again after the filter on scope is removed.
+	function 'AW.ShareOf' =
+			( metric : SCALAR EXPR, scope : COLUMNREF ) =>
+			DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scope ) ) )
+

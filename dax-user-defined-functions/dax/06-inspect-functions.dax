@@ -1,0 +1,10 @@
+// 06-inspect-functions.dax
+// Which user-defined functions does this model hold?
+// INFO.USERDEFINEDFUNCTIONS returns full metadata and needs write permission on the model.
+// INFO.FUNCTIONS with ORIGIN 2 returns names and limited metadata.
+
+EVALUATE
+INFO.USERDEFINEDFUNCTIONS ()
+
+EVALUATE
+INFO.FUNCTIONS ( "ORIGIN", "2" )
