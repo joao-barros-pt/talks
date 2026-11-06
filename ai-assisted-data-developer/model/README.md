@@ -36,7 +36,31 @@ model/
 | `snippets/04-gross-margin-pct-function.tmdl` | 4 | The function `GrossMarginPct` and the measure `Gross Margin %` that calls it |
 | `snippets/05-evidence-query.dax` | 4 and 6 | DAX query: the numbers per company and for the group, to reconcile with `sql/02-company-key-trap.sql` |
 
-Copy the blocks, not the `//` comment lines: they explain the snippet and are not TMDL.
+Each snippet is a TMDL view script: paste the whole file into **TMDL view** in Power BI Desktop and select **Apply**. `ref table` adds the measures to a table that already exists. TMDL has no comment syntax (a `///` line is the description of the object right below it), so the notes on each snippet live here.
+
+- **`00-starting-measures.tmdl`:** fill in the cost of goods sold accounts of your lab before you apply it (check 9 of `sql/00-row-counts-by-company.sql` and the General Posting Setup in Business Central). Several accounts: `{ "<account-1>", "<account-2>" }`. The same list goes into `sql/02-company-key-trap.sql`, so the model and the SQL reconcile.
+- **`03-gross-margin-measure.tmdl`:** reference answer for `prompts/03-measure-in-tmdl.md`. In the project files, the measure goes into `definition/tables/salesInvoices.tmdl`, inside `table salesInvoices`, after `Revenue`, one tab in. The `git diff` shows these lines and nothing else:
+
+```tmdl
+	/// Gross margin: revenue minus cost of goods sold, posted invoices only.
+	measure 'Gross Margin' = [Revenue] - [Cost]
+		formatString: #,0.00
+```
+
+- **`04-gross-margin-pct-function.tmdl`:** reference answer for `prompts/04-dax-udf.md`, a DAX user-defined function and a measure that calls it. DAX user-defined functions are generally available since the June 2026 release of Power BI Desktop and the Power BI service, and need compatibility level 1702 or higher (`compatibilityLevel` in `definition/database.tmdl`). Function names take letters, digits, underscores and dots (for namespaces); parameter names take no dots. In the project files, the function goes into `definition/functions.tmdl` (one file for all the functions of the model), at the first level, and the measure into `definition/tables/salesInvoices.tmdl`, after `Gross Margin`. To be confirmed in the lab: add the function once through TMDL view, export the PBIP and compare.
+
+```tmdl
+/// Gross margin as a share of revenue. Blank when revenue is zero or blank.
+function GrossMarginPct =
+		(revenue : NUMERIC, cost : NUMERIC) =>
+			DIVIDE ( revenue - cost, revenue )
+```
+
+```tmdl
+	/// Gross margin %, through the GrossMarginPct function.
+	measure 'Gross Margin %' = GrossMarginPct ( [Revenue], [Cost] )
+		formatString: 0.0%
+```
 
 ## TMDL rules that bite
 

@@ -1,8 +1,7 @@
-// 03-gross-margin-measure.tmdl
-// Demo 3: reference answer for prompts/03-measure-in-tmdl.md.
-// Goes into definition/tables/salesInvoices.tmdl, inside "table salesInvoices", after the Revenue measure.
-// git diff after the change: these lines, and nothing else.
+createOrReplace
 
-	/// Gross margin: revenue minus cost of goods sold, posted invoices only.
-	measure 'Gross Margin' = [Revenue] - [Cost]
-		formatString: #,0.00
+	ref table salesInvoices
+
+		/// Gross margin: revenue minus cost of goods sold, posted invoices only.
+		measure 'Gross Margin' = [Revenue] - [Cost]
+			formatString: #,0.00

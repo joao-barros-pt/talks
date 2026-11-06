@@ -1,35 +1,11 @@
-// 04-gross-margin-pct-function.tmdl
-// Demo 4: reference answer for prompts/04-dax-udf.md. A DAX user-defined function and a measure that calls it.
-//
-// DAX user-defined functions: generally available since the June 2026 release of Power BI Desktop
-// and the Power BI service. They need database compatibility level 1702 or higher
-// (compatibilityLevel in definition/database.tmdl). Function names take letters, digits, underscores
-// and dots (for namespaces); parameter names take no dots.
-
-
-// ===== Option A: TMDL view in Power BI Desktop (a script, then Apply) =====
-
 createOrReplace
 	/// Gross margin as a share of revenue. Blank when revenue is zero or blank.
 	function GrossMarginPct =
 			(revenue : NUMERIC, cost : NUMERIC) =>
 				DIVIDE ( revenue - cost, revenue )
 
+	ref table salesInvoices
 
-// ===== Option B: the files of the Power BI Project, edited in VS Code =====
-
-// definition/functions.tmdl  (one file for all the functions of the model)
-// The file form is the script above without "createOrReplace", at the first level of indentation.
-// To be confirmed in the lab: add the function once through TMDL view, export the PBIP and compare.
-
-/// Gross margin as a share of revenue. Blank when revenue is zero or blank.
-function GrossMarginPct =
-		(revenue : NUMERIC, cost : NUMERIC) =>
-			DIVIDE ( revenue - cost, revenue )
-
-
-// definition/tables/salesInvoices.tmdl  (inside "table salesInvoices", after 'Gross Margin')
-
-	/// Gross margin %, through the GrossMarginPct function.
-	measure 'Gross Margin %' = GrossMarginPct ( [Revenue], [Cost] )
-		formatString: 0.0%
+		/// Gross margin %, through the GrossMarginPct function.
+		measure 'Gross Margin %' = GrossMarginPct ( [Revenue], [Cost] )
+			formatString: 0.0%
