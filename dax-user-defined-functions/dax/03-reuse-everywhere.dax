@@ -14,9 +14,9 @@ DEFINE
     /// Share of the current value in the total over all values of one column.
     FUNCTION AW.ShareOf = (
             metric : SCALAR EXPR,
-            scope : COLUMNREF
+            scopeColumn : COLUMNREF
         ) =>
-        DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scope ) ) )
+        DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scopeColumn ) ) )
 
     MEASURE Sales[Total Sales] =
         SUM ( Sales[Sales Amount] )

@@ -5,18 +5,18 @@
 
 DEFINE
     /// Relative change between two values. BLANK when the base is zero or blank.
-    /// @param {NUMERIC} current - The value now.
-    /// @param {NUMERIC} previous - The value to compare with.
+    /// @param {NUMERIC} currentValue - The value now.
+    /// @param {NUMERIC} previousValue - The value to compare with.
     /// @param {INT64} [decimals] - Rounding of the result. Optional, 4 by default.
     /// @returns The relative change, rounded, or BLANK when there is no base.
     FUNCTION AW.PctChange = (
-            current : NUMERIC,
-            previous : NUMERIC,
+            currentValue : NUMERIC,
+            previousValue : NUMERIC,
             decimals : INT64 = 4
         ) =>
         IF (
-            previous <> 0,
-            ROUND ( ( current - previous ) / previous, decimals )
+            previousValue <> 0,
+            ROUND ( ( currentValue - previousValue ) / previousValue, decimals )
         )
 
     MEASURE Sales[Total Sales] =

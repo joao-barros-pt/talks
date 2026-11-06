@@ -34,7 +34,7 @@ Every technical claim in the session and in this folder comes from the pages bel
 
 ## Still to confirm in the lab
 
-- `REMOVEFILTERS ( scope )` with a `COLUMNREF` parameter, in `AW.ShareOf`. The Microsoft article warns that passing columns as `EXPR` parameters can show red underlines that are not real errors.
+- `REMOVEFILTERS ( scopeColumn )` with a `COLUMNREF` parameter, in `AW.ShareOf`. The Microsoft article warns that passing columns as `EXPR` parameters can show red underlines that are not real errors.
 - Whether Power BI Desktop raises the compatibility level of the sample model on its own when the first function is saved.
 - The serialized form of `functions.tmdl` after Power BI Desktop saves it (indentation and any `lineageTag`), compared with the files in `model/`.
 - The exact column names `'Date'[Date]` (used in `05-optional-parameters.dax`) and the four values of `'Product'[Category]`: the Microsoft pages name the Date column the table is marked with, but list no column values.

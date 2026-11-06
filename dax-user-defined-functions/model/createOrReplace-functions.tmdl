@@ -7,8 +7,8 @@ createOrReplace
 			DIVIDE ( amount, DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) )
 
 	/// Share of the current value in the total over all values of one column.
-	/// metric is EXPR on purpose: it is evaluated again after the filter on scope is removed.
+	/// metric is EXPR on purpose: it is evaluated again after the filter on scopeColumn is removed.
 	function 'AW.ShareOf' =
-			( metric : SCALAR EXPR, scope : COLUMNREF ) =>
-			DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scope ) ) )
+			( metric : SCALAR EXPR, scopeColumn : COLUMNREF ) =>
+			DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scopeColumn ) ) )
 

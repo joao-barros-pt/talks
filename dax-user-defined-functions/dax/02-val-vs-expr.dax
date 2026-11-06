@@ -4,7 +4,7 @@
 // VAL (the default) evaluates the argument once, before the function runs.
 // The function receives a number, so CALCULATE inside it cannot change it.
 // EXPR passes the expression itself. The function evaluates it where it is used,
-// so CALCULATE ( metric, REMOVEFILTERS ( scope ) ) really removes the filter.
+// so CALCULATE ( metric, REMOVEFILTERS ( scopeColumn ) ) really removes the filter.
 //
 // Expected: the VAL column shows 100% on every row. The EXPR column shows real shares
 // that add up to 100%.
@@ -13,19 +13,19 @@ DEFINE
     /// Wrong on purpose: metric arrives already evaluated.
     FUNCTION AW.ShareOfVal = (
             metric : SCALAR VAL,
-            scope : COLUMNREF
+            scopeColumn : COLUMNREF
         ) =>
-        DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scope ) ) )
+        DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scopeColumn ) ) )
 
     /// Share of the current value in the total over all values of one column.
     /// @param {SCALAR EXPR} metric - The value to compare, evaluated inside the function.
-    /// @param {COLUMNREF} scope - The column whose filter is removed for the total.
+    /// @param {COLUMNREF} scopeColumn - The column whose filter is removed for the total.
     /// @returns A ratio between 0 and 1, or BLANK when the total is blank or zero.
     FUNCTION AW.ShareOf = (
             metric : SCALAR EXPR,
-            scope : COLUMNREF
+            scopeColumn : COLUMNREF
         ) =>
-        DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scope ) ) )
+        DIVIDE ( metric, CALCULATE ( metric, REMOVEFILTERS ( scopeColumn ) ) )
 
 EVALUATE
 SUMMARIZECOLUMNS (

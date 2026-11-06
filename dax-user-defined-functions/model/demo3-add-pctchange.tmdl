@@ -1,6 +1,6 @@
 /// Relative change, rounded. BLANK when the base is zero or blank.
 function 'AW.PctChange' =
-		( current : NUMERIC, previous : NUMERIC, decimals : INT64 = 4 ) =>
-		IF ( previous <> 0,
-			ROUND ( ( current - previous ) / previous, decimals ) )
+		( currentValue : NUMERIC, previousValue : NUMERIC, decimals : INT64 = 4 ) =>
+		IF ( previousValue <> 0,
+			ROUND ( ( currentValue - previousValue ) / previousValue, decimals ) )
 
