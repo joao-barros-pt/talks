@@ -8,8 +8,9 @@
 // In Power BI Desktop: right-click AllCompanies, untick Enable load.
 
 let
-    // 1. The sandbox. Never a production environment.
-    EnvironmentName = "lab-sessoes",
+    // 1. The sandbox, by name as the Navigator shows it (upper case: the admin center shows lab-sessoes,
+    //    the connector lists LAB-SESSOES, and the lookup is case-sensitive). Never a production environment.
+    EnvironmentName = "LAB-SESSOES",
 
     // 2. The four demo companies, by name. A fixed list keeps the lab repeatable.
     Companies = {"CRONUS Lisboa", "CRONUS Porto", "CRONUS Madrid", "CRONUS London"},

@@ -8,7 +8,7 @@
 //                     (Microsoft Entra ID) the first time the connector asks.
 //
 // Example call:
-//   fnCompanyTable("lab-sessoes", "CRONUS Lisboa", "customers")
+//   fnCompanyTable("LAB-SESSOES", "CRONUS Lisboa", "customers")
 //
 // The connector is "Dynamics 365 Business Central" (data source kind Dynamics365BusinessCentral).
 // The navigation below (environment, company, "v2.0", entity) is what the Navigator writes when you pick
@@ -22,7 +22,7 @@ let
     //    UseReadOnlyReplica = true is the default and keeps the reads off the primary database.
     Source = Dynamics365BusinessCentral.ApiContentsWithOptions(null, null, null, [UseReadOnlyReplica = true]),
 
-    // 2. The environment, by name (for the lab: "lab-sessoes").
+    // 2. The environment, by name as the Navigator shows it (for the lab: "LAB-SESSOES").
     EnvironmentNode = Source{[Name = environment]}[Data],
 
     // 3. The company, by name (for example "CRONUS Lisboa").
@@ -50,10 +50,15 @@ let
         )
     ),
 
-    // 8. The company goes into every row. Numbers repeat across companies, so this column is part of every key.
-    WithCompany = Table.AddColumn(NoTimeZone, "company", each company, type text),
+    // 8. API enums (status, documentType, blocked...) come untyped. A lakehouse destination drops untyped
+    //    columns, so they become text.
+    AnyColumns = Table.SelectRows(Table.Schema(NoTimeZone), each [Kind] = "any")[Name],
+    Typed = Table.TransformColumnTypes(NoTimeZone, List.Transform(AnyColumns, (column) => {column, type nullable text})),
 
-    // 9. Company first, then the API columns in their original order.
-    Result = Table.ReorderColumns(WithCompany, {"company"} & Table.ColumnNames(NoTimeZone))
+    // 9. The company goes into every row. Numbers repeat across companies, so this column is part of every key.
+    WithCompany = Table.AddColumn(Typed, "company", each company, type text),
+
+    // 10. Company first, then the API columns in their original order.
+    Result = Table.ReorderColumns(WithCompany, {"company"} & Table.ColumnNames(Typed))
 in
     Result
