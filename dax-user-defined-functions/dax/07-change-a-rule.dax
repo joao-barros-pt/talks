@@ -1,0 +1,67 @@
+// 07-change-a-rule.dax
+// A business rule changes. Which measures does it touch, and what moves?
+// (Asked by Gustavo D. Silveira before the Barcelona session.)
+//
+// Start from a model where 01 and 03 were kept with "Update model with changes":
+// AW.PerOrder is in the model, with Average Order Value and Lines per Order calling it.
+// Step 1 and step 2 read the model and change nothing. Step 3 is the change itself.
+//
+// The example rule change: Finance now wants every "per order" figure rounded
+// to 2 decimals, so the dashboard and the monthly pack show the same number.
+
+// The new rule, as a query-only function with another name (used in step 2).
+DEFINE
+    FUNCTION AW.PerOrderNew = (
+            amount : NUMERIC
+        ) =>
+        ROUND ( DIVIDE ( amount, DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) ), 2 )
+
+// ---------------------------------------------------------------------------
+// Step 1 · Who calls the function?
+// Measures whose expression mentions AW.PerOrder.
+EVALUATE
+SELECTCOLUMNS (
+    FILTER ( INFO.VIEW.MEASURES (), CONTAINSSTRING ( [Expression], "AW.PerOrder" ) ),
+    "Table", [Table],
+    "Measure", [Name],
+    "Expression", [Expression]
+)
+
+// The same from the dependency metadata. It also lists the second level:
+// measures that call a measure that calls the function.
+EVALUATE
+FILTER (
+    INFO.CALCDEPENDENCY (),
+    [REFERENCED_OBJECT] = "AW.PerOrder"
+        || [REFERENCED_OBJECT] IN { "Average Order Value", "Lines per Order" }
+)
+// If your Power BI Desktop version does not list functions in INFO.CALCDEPENDENCY,
+// the first query is enough: functions are referenced by name in the expression.
+
+// ---------------------------------------------------------------------------
+// Step 2 · Before and after, side by side, without touching the model.
+// The new rule is AW.PerOrderNew, defined at the top of this file, only for this query.
+EVALUATE
+SUMMARIZECOLUMNS (
+    'Date'[Fiscal Year],
+    "AOV today", AW.PerOrder ( SUM ( Sales[Sales Amount] ) ),
+    "AOV new rule", AW.PerOrderNew ( SUM ( Sales[Sales Amount] ) ),
+    "Lines per order today", AW.PerOrder ( COUNTROWS ( Sales ) ),
+    "Lines per order new rule", AW.PerOrderNew ( COUNTROWS ( Sales ) )
+)
+ORDER BY 'Date'[Fiscal Year]
+
+// ---------------------------------------------------------------------------
+// Step 3 · Apply the change: one place, every measure follows.
+// In model/functions.tmdl (or TMDL view), change only the body of AW.PerOrder:
+//
+//     ROUND ( DIVIDE ( amount, DISTINCTCOUNT ( 'Sales Order'[Sales Order] ) ), 2 )
+//
+// Commit before and after: the Git diff is one line, and the list from step 1
+// is the list of measures to check. No measure is edited.
+//
+// Which reports use those measures?
+// - Power BI Project (PBIR) in Git: search the report folder for the measure names,
+//   for example:  git grep -l "Average Order Value" -- "*.Report"
+// - Published model: in the Fabric or Power BI workspace, open the semantic model,
+//   Lineage view or Impact analysis, to see the reports and dashboards built on it.

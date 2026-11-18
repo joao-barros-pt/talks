@@ -11,6 +11,7 @@ Every file runs on its own in Power BI Desktop, **DAX query view**, on the **Adv
 | `04-official-val-vs-expr.dax` | backup | Microsoft's own val vs expr example, on the same sample model |
 | `05-optional-parameters.dax` | extra | `AW.PctChange` with a default parameter |
 | `06-inspect-functions.dax` | extra | `INFO.USERDEFINEDFUNCTIONS` and `INFO.FUNCTIONS` |
+| `07-change-a-rule.dax` | extra | A business rule changes: which measures call the function, before and after side by side, and the one-line change |
 
 ## The model, in four facts
 
